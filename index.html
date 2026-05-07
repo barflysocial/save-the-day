@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <base href="/">
+  <title>Save the Day V12 — Host Logo Slot</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <button id="global-home-btn" class="nav-home-btn" type="button" data-action="home" hidden>Home</button>
+    <main id="screen" class="screen"></main>
+  </div>
+
+
+  <template id="intro-template">
+    <section class="intro-screen logo-image-intro" aria-label="Barfly Social intro animation">
+      <div class="intro-logo-stage">
+        <img src="assets/barfly_social_logo_intro.png" alt="Barfly Social" class="intro-logo-image" />
+      </div>
+    </section>
+  </template>
+
+  <template id="title-template">
+    <section class="title-screen clean-title-screen">
+      <div class="title-overlay"></div>
+      <div class="title-content player-title-content">
+        <div class="event-summary-card title-event-card" id="title-event-summary"></div>
+        <section class="session-picker-panel">
+          <div class="session-picker-head">
+            <span class="small-label">Choose a Session</span>
+            <strong>Pick the session you want to join</strong>
+          </div>
+          <div id="title-session-picker" class="session-picker-list"></div>
+        </section>
+        <div class="title-action-row rounded-action-row">
+          <button class="primary-btn rounded-btn" data-action="rsvp">RSVP</button>
+          <button class="primary-btn cyan-btn rounded-btn" data-action="checkin">Check In</button>
+          <button class="ghost-btn share-title-btn rounded-btn" data-action="share-game">Share</button>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="how-template">
+    <section class="panel-screen compact">
+      <div class="panel hero-panel">
+        <p class="eyebrow">How to Play</p>
+        <h1>Build. Choose. Survive.</h1>
+        <ol class="how-list">
+          <li>Each round gives you <strong>12 items</strong>. Tap an item to inspect it.</li>
+          <li>Tap or drag items into the <strong>Build Box</strong>. The screen shows how many items each possible tool needs.</li>
+          <li>Press <strong>Assemble Tool</strong>. A correct recipe creates one of the two possible tools.</li>
+          <li>Choose <strong>Option A</strong> or <strong>Option B</strong>. Only one tool solves the situation.</li>
+          <li>Earn up to <strong>5 puzzle points</strong>, then answer a <strong>5-question case quiz</strong>.</li>
+        </ol>
+        <button class="primary-btn" data-action="access">RSVP / Enter Game Code</button>
+        <button class="ghost-btn" data-action="host">Host Setup</button>
+        <button class="ghost-btn" data-action="title">Back</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="host-login-template">
+    <section class="panel-screen host-screen">
+      <div class="panel access-panel host-panel">
+        <p class="eyebrow">Host Only</p>
+        <h1>Enter Host PIN</h1>
+        <p class="quiz-intro">This page is for hosts only. Enter the Host PIN to view RSVPs, check-ins, share clicks, settings, and reset controls.</p>
+        <div class="event-summary-card" id="host-login-event-summary"></div>
+        <label class="field-label" for="host-login-pin">Host PIN</label>
+        <input id="host-login-pin" class="text-field code-field" type="password" maxlength="40" placeholder="Enter host PIN" />
+        <p id="host-login-status" class="access-status"></p>
+        <button class="primary-btn" type="button" data-action="unlock-host">Open Host Dashboard</button>
+        <button class="ghost-btn" type="button" data-action="title">Home</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="host-template">
+    <section class="panel-screen host-screen">
+      <div class="panel access-panel host-panel">
+        <p class="eyebrow">Host Controls</p>
+        <h1>Session Setup</h1>
+        <p class="quiz-intro">Add the venue location and create up to 3 joinable sessions with calendar date and time, like a movie theater. You can also reset the local session back to a clean state.</p>
+
+        <div class="host-grid">
+          <div>
+            <label class="field-label" for="host-date">Event Date</label>
+            <input id="host-date" class="text-field" type="date" />
+          </div>
+          <div>
+            <label class="field-label" for="host-time">Event Time</label>
+            <input id="host-time" class="text-field" type="time" />
+          </div>
+          <div class="host-wide">
+            <label class="field-label" for="host-location">Location</label>
+            <input id="host-location" class="text-field" type="text" maxlength="80" placeholder="Venue name or address" />
+          </div>
+          <div class="host-wide">
+            <label class="field-label" for="host-logo-upload">Event / Venue Logo</label>
+            <input id="host-logo-upload" class="text-field" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" />
+            <div class="host-logo-controls">
+              <div class="host-logo-preview-wrap">
+                <img id="host-logo-preview" class="host-logo-preview" alt="Selected event logo preview" hidden />
+                <span id="host-logo-preview-fallback" class="small-hint">No custom logo uploaded. Default Barfly logo will be used.</span>
+              </div>
+              <button class="ghost-btn small" type="button" data-action="remove-logo">Remove Custom Logo</button>
+            </div>
+            <p class="small-hint">This logo appears in the Event Details card on the player title screen.</p>
+          </div>
+          <div class="host-wide session-host-panel">
+            <label class="field-label">Session Options</label>
+            <div class="session-host-grid">
+              <div class="session-host-card">
+                <strong>Session 1</strong>
+                <input id="session1-date" class="text-field" type="date" />
+                <input id="session1-time" class="text-field" type="time" />
+                <input id="session1-code" class="text-field code-field" type="text" maxlength="20" placeholder="SAVE1" />
+                <input id="session1-cap" class="text-field code-field" type="number" min="1" max="500" value="50" />
+                <select id="session1-status" class="text-field">
+                  <option value="open">Open</option>
+                  <option value="checkin">Check-In Open</option>
+                  <option value="started">Game Started</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+              <div class="session-host-card">
+                <strong>Session 2</strong>
+                <input id="session2-date" class="text-field" type="date" />
+                <input id="session2-time" class="text-field" type="time" />
+                <input id="session2-code" class="text-field code-field" type="text" maxlength="20" placeholder="SAVE2" />
+                <input id="session2-cap" class="text-field code-field" type="number" min="1" max="500" value="50" />
+                <select id="session2-status" class="text-field">
+                  <option value="open">Open</option>
+                  <option value="checkin">Check-In Open</option>
+                  <option value="started">Game Started</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+              <div class="session-host-card">
+                <strong>Session 3</strong>
+                <input id="session3-date" class="text-field" type="date" />
+                <input id="session3-time" class="text-field" type="time" />
+                <input id="session3-code" class="text-field code-field" type="text" maxlength="20" placeholder="SAVE3" />
+                <input id="session3-cap" class="text-field code-field" type="number" min="1" max="500" value="50" />
+                <select id="session3-status" class="text-field">
+                  <option value="open">Open</option>
+                  <option value="checkin">Check-In Open</option>
+                  <option value="started">Game Started</option>
+                  <option value="closed">Closed</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="field-label" for="host-game-code">Game Code</label>
+            <input id="host-game-code" class="text-field code-field" type="text" maxlength="20" placeholder="SAVE" />
+            <p class="small-hint">Fallback code. Each session below has its own code.</p>
+          </div>
+          <div>
+            <label class="field-label" for="host-max-players">Player Cap</label>
+            <input id="host-max-players" class="text-field code-field" type="number" min="1" max="500" value="50" />
+            <p class="small-hint">Default cap is 50 players.</p>
+          </div>
+          <div class="host-wide">
+            <label class="field-label" for="host-pin">Host PIN</label>
+            <input id="host-pin" class="text-field code-field" type="password" maxlength="40" placeholder="Enter host PIN" />
+            <p class="small-hint">Required for live database host controls. Default local test PIN is 1234 unless changed in HOST_PIN.</p>
+          </div>
+        </div>
+
+        <p id="host-status" class="access-status"></p>
+        <button class="primary-btn" type="button" data-action="save-host">Save Host Details</button>
+
+        <div class="session-controls">
+          <h2>Reset Controls</h2>
+          <p>Use these when you need to start over, test again, or clear the room after a game.</p>
+          <button class="ghost-btn" type="button" data-action="reset-game">Reset Current Player Game</button>
+          <button class="danger-btn" type="button" data-action="clear-selected-session">Clear Selected Session</button>
+          <button class="danger-btn" type="button" data-action="clear-session">Clear All Sessions</button>
+          <button class="danger-btn" type="button" data-action="restore-original">Restore Original State</button>
+        </div>
+
+        <div class="session-controls roster-panel">
+          <h2>Live Session Dashboard</h2>
+          <label class="field-label" for="host-session-filter">View Session</label>
+          <select id="host-session-filter" class="text-field">
+            <option value="">All Sessions</option>
+          </select>
+          <div id="host-session-stat-cards" class="host-session-stat-cards"></div>
+          <div class="host-stat-grid" id="host-stat-grid">
+            <div><span>RSVPs</span><strong id="host-rsvp-count">0</strong></div>
+            <div><span>Check-Ins</span><strong id="host-checkin-count">0</strong></div>
+            <div><span>Share Clicks</span><strong id="host-share-count">0</strong></div>
+          </div>
+          <p id="host-live-status">Refresh to view live RSVPs, check-ins, share clicks, and results.</p>
+          <button class="ghost-btn" type="button" data-action="load-roster">Refresh Dashboard</button>
+          <div id="host-roster-list" class="host-roster-list"></div>
+        </div>
+
+        <button class="ghost-btn" data-action="host-gate">Lock / Change Host PIN</button>
+        <button class="ghost-btn" data-action="title">Home</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="access-template">
+    <section class="panel-screen access-screen">
+      <div class="panel access-panel">
+        <p class="eyebrow">Mission Access</p>
+        <h1>RSVP Required</h1>
+        <p class="quiz-intro">Enter your name and Instagram to reserve your spot. Once your RSVP is confirmed, the RSVP form closes and you can enter the game code.</p>
+
+        <div class="event-summary-card" id="access-event-summary"></div>
+
+        <section class="session-picker-panel compact-session-panel">
+          <div class="session-picker-head">
+            <span class="small-label">Selected Session</span>
+            <strong>Choose your session before RSVPing</strong>
+          </div>
+          <div id="access-session-picker" class="session-picker-list"></div>
+        </section>
+
+        <div class="access-count-card">
+          <span>Players RSVP'd</span>
+          <strong id="player-count">0 / 50</strong>
+        </div>
+        <p class="small-hint" id="backend-note">Checking database RSVP mode...</p>
+
+        <div id="rsvp-section" class="access-section">
+          <h2>Player RSVP</h2>
+          <label class="field-label" for="player-name">Name</label>
+          <input id="player-name" class="text-field" type="text" maxlength="40" autocomplete="name" placeholder="Your name" />
+          <label class="field-label" for="player-instagram">Instagram</label>
+          <input id="player-instagram" class="text-field" type="text" maxlength="40" autocomplete="off" placeholder="@yourhandle" />
+          <p id="rsvp-status" class="access-status"></p>
+          <button class="primary-btn" type="button" data-action="submit-rsvp">Submit RSVP</button>
+        </div>
+
+        <div id="rsvp-confirmed" class="access-section success-section" hidden>
+          <h2>RSVP Confirmed</h2>
+          <p id="confirmed-copy"></p>
+        </div>
+
+        <div id="code-section" class="access-section" hidden>
+          <h2>Enter Game Code</h2>
+          <label class="field-label" for="game-code">Game Code</label>
+          <input id="game-code" class="text-field code-field" type="text" maxlength="20" autocomplete="off" placeholder="Enter host code" />
+          <p class="small-hint" id="code-hint">Ask the host for the current code.</p>
+          <p id="code-status" class="access-status"></p>
+          <button class="primary-btn" type="button" data-action="verify-code">Start Mission</button>
+        </div>
+
+        <button class="ghost-btn" data-action="checkin">Check In</button>
+        <button class="ghost-btn" data-action="home">Home</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="share-template">
+    <section class="panel-screen access-screen">
+      <div class="panel access-panel share-game-panel">
+        <p class="eyebrow">Share Game</p>
+        <h1>Invite Players</h1>
+        <p class="quiz-intro">Share the player-facing URL by QR code, link, or text. The host dashboard counts every Share button click.</p>
+        <div class="event-summary-card" id="share-event-summary"></div>
+        <div class="qr-card centered-qr-card">
+          <img id="player-qr" class="player-qr" alt="Player URL QR code" />
+          <div>
+            <span class="small-label">Scan to Join</span>
+            <p id="share-text-preview" class="small-hint"></p>
+          </div>
+        </div>
+        <p id="share-status" class="access-status"></p>
+        <button class="primary-btn" type="button" data-action="native-share-player">Share Link / Text</button>
+        <button class="ghost-btn" type="button" data-action="copy-player-url">Copy Link</button>
+        <button class="ghost-btn" type="button" data-action="title">Home</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="checkin-template">
+    <section class="panel-screen access-screen">
+      <div class="panel access-panel">
+        <p class="eyebrow">Player Check In</p>
+        <h1>Check In to Play</h1>
+        <p class="quiz-intro">Use the Instagram handle from your RSVP and enter the game code from the host.</p>
+        <div class="event-summary-card" id="checkin-event-summary"></div>
+        <section class="session-picker-panel compact-session-panel">
+          <div class="session-picker-head">
+            <span class="small-label">Your Session</span>
+            <strong>Check in to your selected session</strong>
+          </div>
+          <div id="checkin-session-picker" class="session-picker-list"></div>
+        </section>
+        <div class="access-count-card">
+          <span>Checked In</span>
+          <strong id="checkin-count">0</strong>
+        </div>
+        <label class="field-label" for="checkin-instagram">Instagram</label>
+        <input id="checkin-instagram" class="text-field" type="text" maxlength="40" autocomplete="off" placeholder="@yourhandle" />
+        <label class="field-label" for="checkin-code">Game Code</label>
+        <input id="checkin-code" class="text-field code-field" type="text" maxlength="20" autocomplete="off" placeholder="Enter host code" />
+        <p id="checkin-status" class="access-status"></p>
+        <button class="primary-btn" type="button" data-action="submit-checkin">Check In & Start Mission</button>
+        <button class="ghost-btn" type="button" data-action="rsvp">RSVP First</button>
+        <button class="ghost-btn" type="button" data-action="home">Home</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="round-template">
+    <section class="game-screen">
+      <header class="game-header">
+        <div>
+          <p class="eyebrow" id="round-label"></p>
+          <h1 id="round-title"></h1>
+          <p class="round-event-pill" id="round-event-pill"></p>
+        </div>
+        <div class="hud">
+          <div class="hud-box"><span>Time</span><strong id="timer">00:00</strong></div>
+          <div class="hud-box"><span>Puzzle Score</span><strong id="score">0 / 5</strong></div>
+          <button class="ghost-btn small home-hud-btn" data-action="home">Home</button>
+        </div>
+      </header>
+
+      <section class="round-flow">
+        <aside class="mission-panel flow-card situation-card">
+          <div class="flow-step">1</div>
+          <h2>Situation</h2>
+          <p id="round-story"></p>
+          <h3>Mission Objective</h3>
+          <ul id="objective-list"></ul>
+          <div class="inspect-card" id="inspect-card">
+            <span class="small-label">Tap an item</span>
+            <h3>Item Inspector</h3>
+            <p>Item details will appear here.</p>
+          </div>
+        </aside>
+
+        <section class="inventory-wrap flow-card tools-card">
+          <div class="flow-step">2</div>
+          <div class="inventory-title">
+            <h2>Available Tools</h2>
+            <p>Tap to inspect. Tap again or drag to add.</p>
+          </div>
+          <div class="inventory" id="inventory"></div>
+        </section>
+
+        <section class="build-stage flow-card build-card">
+          <div class="flow-step">3</div>
+          <div class="build-top">
+            <h2>Build Box</h2>
+            <p>Place useful items here, then assemble.</p>
+            <div class="recipe-helper" id="recipe-helper"></div>
+          </div>
+          <div class="build-box" id="build-box" aria-label="Build box" tabindex="0">
+            <div class="empty-build">Drop or tap items to add them here.</div>
+          </div>
+          <div class="build-actions">
+            <button class="primary-btn small" data-action="assemble">Assemble Tool</button>
+            <button class="ghost-btn small" data-action="clear">Clear Box</button>
+          </div>
+          <div class="created-tool" id="created-tool" hidden>
+            <span class="small-label">New Tool Created</span>
+            <h3></h3>
+            <p></p>
+          </div>
+        </section>
+
+        <aside class="choice-panel flow-card choice-card">
+          <div class="flow-step">4</div>
+          <h2>Choose Your Fix</h2>
+          <p class="choice-note">Both options require a built tool. Only one saves the day.</p>
+          <div id="choices" class="choices"></div>
+        </aside>
+      </section>
+    </section>
+  </template>
+
+  <template id="round-result-template">
+    <section class="panel-screen compact">
+      <div class="panel result-panel" id="result-panel">
+        <p class="eyebrow" id="result-label"></p>
+        <h1 id="result-title"></h1>
+        <p id="result-copy"></p>
+        <div class="result-score" id="result-score"></div>
+        <button class="primary-btn" id="next-btn" disabled>Next in 10</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="quiz-template">
+    <section class="panel-screen quiz-screen">
+      <div class="panel wide-panel">
+        <p class="eyebrow">Final Case Quiz</p>
+        <h1>Solve the Case</h1>
+        <p class="quiz-intro">You survived the action rounds. Now prove you understand what really happened.</p>
+        <form id="quiz-form" class="quiz-form"></form>
+        <button class="primary-btn" data-action="submit-quiz">Submit Case Answers</button>
+      </div>
+    </section>
+  </template>
+
+  <template id="final-template">
+    <section class="panel-screen final-screen">
+      <div class="panel final-panel">
+        <p class="eyebrow">Mission Complete</p>
+        <h1 id="final-rank"></h1>
+        <p id="final-summary"></p>
+        <div class="final-score" id="final-score"></div>
+        <div class="breakdown" id="breakdown"></div>
+
+        <section class="share-panel" id="share-panel" hidden>
+          <div class="share-panel-head">
+            <div>
+              <p class="eyebrow" id="share-kicker">Shareable Result Graphics</p>
+              <h2 id="share-headline">Create your social post</h2>
+            </div>
+            <p class="share-copy" id="share-copy">Includes Barfly branding, game title, venue or location, event date, and player result details.</p>
+          </div>
+          <div class="share-preview-wrap">
+            <img id="share-preview" class="share-preview" src="" alt="Result social share preview" />
+            <canvas id="share-canvas" width="1080" height="1080" hidden></canvas>
+          </div>
+          <p class="share-format-label" id="share-format-label">Square post preview</p>
+          <div class="share-actions" id="share-actions"></div>
+        </section>
+
+        <button class="primary-btn" data-action="restart">Play Again</button>
+        <button class="ghost-btn" data-action="host">Host Setup</button>
+        <button class="ghost-btn" data-action="home">Home</button>
+      </div>
+    </section>
+  </template>
+
+  <script src="/script.js"></script>
+</body>
+</html>
