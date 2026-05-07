@@ -1,0 +1,19 @@
+{
+  "name": "save-the-day-barfly-intro-backend",
+  "version": "6.0.0",
+  "description": "Save the Day web game with Barfly intro animation and PostgreSQL RSVP/session backend.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "db:schema": "psql $DATABASE_URL -f database.sql"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
