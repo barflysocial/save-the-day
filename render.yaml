@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: save-the-day-v11
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST_PIN
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: save-the-day-db
+          property: connectionString
+
+databases:
+  - name: save-the-day-db
